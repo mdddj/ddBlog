@@ -1,57 +1,19 @@
-# Ant Design Pro
+# 典典博客
 
-This project is initialized with [Ant Design Pro](https://pro.ant.design). Follow is the quick guide for how to use.
+典典博客 -React，是 Tumo 项目的React版本，采用了SpringBoot2.1.3 + React前后端分离式开发。项目集成了Shiro、Swagger等框架，对于初学React前后端分离项目的朋友来说，这是个不错的例子。
 
-## Environment Prepare
+## 预览
 
-Install `node_modules`:
+![TIM截图20200321164013](https://user-images.githubusercontent.com/29020213/77222921-cbfd6500-6b92-11ea-94c5-974600dadc7b.png)
+![TIM截图20200321164027](https://user-images.githubusercontent.com/29020213/77222932-e8010680-6b92-11ea-8bf7-6a358a168e18.png)
+![TIM截图20200321164039](https://user-images.githubusercontent.com/29020213/77222933-f3543200-6b92-11ea-85d0-5d50356356c4.png)
+![TIM截图20200321164052](https://user-images.githubusercontent.com/29020213/77222939-0109b780-6b93-11ea-9dee-8749681df1fd.png)
 
-```bash
-npm install
+## 使用前准备
+
+打开`config/defaultSettings.js`文件修改`siteUrl`属性值为后台主页地址+端口号
+
+## 启动
+
 ```
-
-or
-
-```bash
-yarn
-```
-
-## Provided Scripts
-
-Ant Design Pro provides some useful script to help you quick start and build with web project, code style check and test.
-
-Scripts provided in `package.json`. It's safe to modify or add additional script:
-
-### Start project
-
-```bash
-npm start
-```
-
-### Build project
-
-```bash
-npm run build
-```
-
-### Check code style
-
-```bash
-npm run lint
-```
-
-You can also use script to auto fix some lint error:
-
-```bash
-npm run lint:fix
-```
-
-### Test code
-
-```bash
-npm test
-```
-
-## More
-
-You can view full document on our [official website](https://pro.ant.design). And welcome any feedback in our [github](https://github.com/ant-design/ant-design-pro).
+npm run start:no-mock
