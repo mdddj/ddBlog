@@ -172,20 +172,26 @@ export default {
                   path: '/dtk/carousel',
                   component: './dtk/carousel-list',
                 },
+                {
+                  name: 'Blank',
+                  icon: 'smile',
+                  path: '/dtk/text',
+                  component: './dtk/text',
+                },
               ],
             },
             {
               name: '设置',
               icon: 'appstore',
               path: '/sett',
-              routes:[
+              routes: [
                 {
                   name: '个人资料',
                   icon: 'smile',
                   path: '/sett/me',
                   component: './me/me',
                 },
-              ]
+              ],
             },
             {
               component: './404',
