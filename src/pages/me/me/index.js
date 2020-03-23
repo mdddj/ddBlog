@@ -103,13 +103,14 @@ class Page extends Component {
           </Tabs>
         </Card>
         <Modal
+        forceRender
           title="修改头像"
           visible={this.state.updateHeaderModal}
           footer={null}
           onCancel={() => this.setState({ updateHeaderModal: false })}
         >
 
-          <Form forceRender ref={this.formRef} layout='vertical' onFinish={this.onFinish}>
+          <Form  ref={this.formRef} layout='vertical' onFinish={this.onFinish}>
             <Alert message="建议使用图床上传目标图片获取src地址" type="success" closable showIcon />
             <Form.Item name="avatar" label="头像地址" rules={[{ required: true, message: '头像不能为空' }, { type: 'url', message: '输入合法的URL' }]}>
               <TextArea rows={4} placeholder='输入URL' />

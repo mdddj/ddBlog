@@ -1,6 +1,6 @@
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import React, { Component } from 'react';
-import { Form, Card, Input, Button, Row, Col, Select, Radio, Divider, Spin } from 'antd';
+import { Form, Card, Input, Button, Row, Col, Select, Radio, Divider, Spin,Modal,Alert } from 'antd';
 import { PlusOutlined } from '@ant-design/icons'
 import { connect } from 'dva';
 import BraftEditor from 'braft-editor'
@@ -37,15 +37,20 @@ const options = {
 BraftEditor.use(CodeHighlighter(options))
 
 const { Option } = Select;
+const { TextArea } =Input;
 class ArticleAdd extends Component {
 
   state = {
     editorState: BraftEditor.createEditorState('<p>请输入文章内容 <b>Hello World!</b></p>'),
     newTagNameIs: '',
-    updateItem: null
+    updateItem: null,
+    showCoverModal:false,
+    cover:''
   }
 
   formRef = React.createRef();
+
+  formRef2 = React.createRef();
 
   componentDidMount() {
     const { query: { update } } = this.props.location;
@@ -76,6 +81,8 @@ class ArticleAdd extends Component {
           tags: this.getSelectedTags(obj.tags),
           state: obj.state
         });
+        this.formRef2.current.setFieldsValue({cover:obj.cover})
+        // console.log(this.formRef2)
         this.setState({ editorState: BraftEditor.createEditorState(obj.content) })
       }
     })
@@ -94,16 +101,21 @@ class ArticleAdd extends Component {
     this.setState({ editorState })
   }
 
+  onFinish = values =>{
+    this.setState({cover:values.cover})
+  }
+
   handleSubmit = values => {
     const data = values;
     const { dispatch } = this.props;
-    const { editorState, updateItem } = this.state;
+    const { editorState, updateItem, cover } = this.state;
     const outputHTML = editorState.toHTML();
     data.content = outputHTML;
     const { tags } = data;
     const arr = [];
     tags.map(v => arr.push({ id: v }))
     data.tags = arr;
+    data.cover = cover;
     if (updateItem) data.id = updateItem.id
     dispatch({
       type: 'article/add',
@@ -197,16 +209,34 @@ class ArticleAdd extends Component {
               <Form.Item name='state' label='发布类型' rules={[{ required: true, message: '请选择发布类型' }]}>
                 <Radio.Group>
                   <Radio value="1">立即发布</Radio>
-                  <Radio value="0">保存草稿</Radio>
-                  <Radio value="2">定时发布</Radio>
                 </Radio.Group>
               </Form.Item>
               <Form.Item>
                 <Button type="primary" htmlType="submit">提交</Button>
+                <Button style={{marginLeft:10}} onClick={()=>this.setState({showCoverModal:true})}>添加文章头图</Button>
               </Form.Item>
             </Form>
           </Card>
         </Spin>
+
+        <Modal
+          forceRender
+          title="修改头像"
+          visible={this.state.showCoverModal}
+          footer={null}
+          onCancel={() => this.setState({ showCoverModal: false })}
+        >
+
+          <Form ref={this.formRef2} layout='vertical' onFinish={this.onFinish}>
+            <Alert message="建议使用图床上传目标图片获取src地址" type="success" closable showIcon />
+            <Form.Item name="cover" label="文章缩略图" rules={[{ type: 'url', message: '输入合法的URL' }]}>
+              <TextArea rows={4} placeholder='输入URL' />
+            </Form.Item>
+            <Form.Item >
+              <Button htmlType="submit" onClick={()=>this.setState({showCoverModal:false})}>提交</Button>
+            </Form.Item>
+          </Form>
+        </Modal>
       </PageHeaderWrapper>
     );
   }
