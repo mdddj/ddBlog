@@ -16,8 +16,8 @@ class Page extends Component {
   formRef = React.createRef();
 
   state = {
+    editorState: BraftEditor.createEditorState('<p>请输入文章内容 <b>Hello World!</b></p>'),
     showDrawer: false,
-    editorState: BraftEditor.createEditorState(''),
     outputHTML: '<p></p>',
     type: 'textArea',
   };
@@ -47,7 +47,7 @@ class Page extends Component {
    */
   handleChange = editorState => {
     this.setState({
-      editorState: editorState.createEditorState(''),
+      editorState,
       outputHTML: editorState.toHTML(),
     });
   };
@@ -128,8 +128,8 @@ class Page extends Component {
             添加新的
           </Button>
         </Card>
-        <Card>
-          <Table
+        <Card style={{ marginTop: 8 }}>
+          {/* <Table
             loading={listLoading}
             columns={this.columns}
             dataSource={content}
@@ -138,6 +138,24 @@ class Page extends Component {
               total: listData ? listData.totalElements : 0,
               limit: listData ? listData.number : 10,
             }}
+          /> */}
+          <List
+            header='列表'
+            pagination={{
+              current: listData ? listData.size + 1 : 1,
+              total: listData ? listData.totalElements : 0,
+              limit: listData ? listData.number : 10,
+            }}
+            dataSource={content}
+            renderItem={item => (
+              <List.Item>
+                <List.Item.Meta
+                  title={item.type}
+                  description={item.extra}
+                />
+                <div>操作</div>
+              </List.Item>
+            )}
           />
         </Card>
 

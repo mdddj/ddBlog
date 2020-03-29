@@ -56,6 +56,7 @@ BraftEditor.use(CodeHighlighter(options));
 const { Option } = Select;
 const { TextArea } = Input;
 class ArticleAdd extends Component {
+  
   state = {
     editorState: BraftEditor.createEditorState('<p>请输入文章内容 <b>Hello World!</b></p>'),
     newTagNameIs: '',
