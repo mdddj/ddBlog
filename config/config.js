@@ -173,7 +173,7 @@ export default {
                   component: './dtk/carousel-list',
                 },
                 {
-                  name: 'Blank',
+                  name: '字典',
                   icon: 'smile',
                   path: '/dtk/text',
                   component: './dtk/text',

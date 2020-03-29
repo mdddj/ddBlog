@@ -52,7 +52,7 @@
     "@ant-design/pro-layout": "^5.0.0",
     "@ant-design/pro-table": "^2.0.0",
     "@antv/data-set": "^0.10.2",
-    "antd": "^4.0.1",
+    "antd": "^4.0.4",
     "bizcharts": "^3.5.3-beta.0",
     "braft-editor": "^2.3.8",
     "braft-extensions": "^0.1.0",

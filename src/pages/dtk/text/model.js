@@ -1,20 +1,31 @@
-import { getText } from './service';
+import { message } from 'antd';
+import { list, add } from './service';
 
 export default {
-  namespace: 'dtkAndtext',
+  namespace: 'text',
   state: {
-    text: 'loading...',
+    listData: null,
   },
 
   effects: {
-    *fetch(_, { call, put }) {
-      const { text } = yield call(getText);
-      yield put({
-        type: 'save',
-        payload: {
-          text,
-        },
-      });
+    *list({ payload }, { call, put }) {
+      const response = yield call(list, payload);
+      if (response.code === 200) {
+        yield put({
+          type: 'save',
+          payload: { listData: response.data },
+        });
+      } else {
+        message.error(response.msg);
+      }
+    },
+    *add({ payload }, { call, put }) {
+      const response = yield call(add, payload);
+      if (response.code === 200) {
+        message.success(response.msg);
+      } else {
+        message.error(response.msg);
+      }
     },
   },
 
