@@ -5,10 +5,12 @@ import { connect } from 'dva';
 import BraftEditor from 'braft-editor';
 
 import styles from './style.less';
+
 const { TextArea } = Input;
 
-@connect(({ text: { listData } }) => ({
+@connect(({ text: { listData }, loading }) => ({
   listData,
+  listLoading: loading.effects['text/list'],
 }))
 class Page extends Component {
   formRef = React.createRef();
@@ -29,22 +31,10 @@ class Page extends Component {
     {
       title: '类型',
       dataIndex: 'type',
-      key: 'type',
     },
     {
       title: '表单类型',
       dataIndex: 'field',
-      key: 'field',
-    },
-    {
-      title: '操作',
-      key: 'action',
-      render: (text, record) => (
-        <span>
-          <a style={{ marginRight: 16 }}>Invite {record.name}</a>
-          <a>Delete</a>
-        </span>
-      ),
     },
   ];
 
@@ -106,7 +96,7 @@ class Page extends Component {
   };
 
   render() {
-    const { listData } = this.props;
+    const { listData, listLoading } = this.props;
     const { type } = this.state;
 
     let content = [];
@@ -140,10 +130,11 @@ class Page extends Component {
         </Card>
         <Card>
           <Table
+            loading={listLoading}
             columns={this.columns}
             dataSource={content}
             pagination={{
-              current: listData ? listData.size : 1,
+              current: listData ? listData.size + 1 : 1,
               total: listData ? listData.totalElements : 0,
               limit: listData ? listData.number : 10,
             }}
