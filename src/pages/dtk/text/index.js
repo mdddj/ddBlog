@@ -68,14 +68,13 @@ class Page extends Component {
       .validateFields()
       .then(values => {
         const dataObj = this.getContext(values);
-        console.log(dataObj);
         dispatch({
           type: 'text/add',
           payload: dataObj,
         });
         this.setState({ showDrawer: false });
       })
-      .catch(errorInfo => {
+      .catch(() => {
         message.error('请按提示修改正确内容!');
       });
   };
@@ -108,8 +107,8 @@ class Page extends Component {
     let content = [];
     if (listData !== null) {
       content = [...listData.content];
+      console.log(content);
     }
-    console.log(content);
     const textAreaItem = (
       <TextArea
         onChange={this.onChange}
@@ -134,7 +133,7 @@ class Page extends Component {
             添加新的
           </Button>
         </Card>
-        <Card style={{ marginTop: 8 }}>
+        <Card style={{ marginTop: 8 }} loading={listLoading}>
           <List
             header='列表'
             pagination={{
@@ -201,7 +200,7 @@ class Page extends Component {
             initialValues={{ field: 'textArea', extra: '' }}
           >
             <Form.Item
-              label="类型"
+              label="类型 (建议英文+数字)"
               rules={[{ required: true, message: '关键字不能为空' }]}
               name="type"
             >

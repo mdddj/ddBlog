@@ -23,6 +23,10 @@ export default {
       const response = yield call(add, payload);
       if (response.code === 200) {
         message.success(response.msg);
+        yield put({
+          type: 'addItem',
+          payload: response.data
+        })
       } else {
         message.error(response.msg);
       }
@@ -36,5 +40,10 @@ export default {
         ...payload,
       };
     },
+    addItem(state, { payload }) {
+      const {listData, listData: { content } } = state;
+      content.concat(payload);
+      return { ...state, listData: { ...listData, content } };
+    }
   },
 };
