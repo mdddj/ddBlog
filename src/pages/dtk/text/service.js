@@ -11,3 +11,9 @@ export function add(params) {
     data: params,
   });
 }
+
+export function del(id){
+  return request(`${urls.text}/${id}`,{
+    method:'delete'
+  })
+}

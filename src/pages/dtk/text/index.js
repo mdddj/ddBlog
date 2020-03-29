@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Table, Card, Button, Drawer, Input, Form, Radio, message, List, Menu, Dropdown } from 'antd';
-import { DownOutlined } from '@ant-design/icons';
+import { Modal, Card, Button, Drawer, Input, Form, Radio, message, List, Menu, Dropdown } from 'antd';
+import { DownOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import BraftEditor from 'braft-editor';
 
@@ -89,6 +89,7 @@ class Page extends Component {
     return values;
   };
 
+  // 表单切换(普通/富文本)
   fieldTypeChange = e => {
     const { value } = e.target;
     console.log(value);
@@ -100,6 +101,43 @@ class Page extends Component {
     this.setState({showDrawer:false})
   }
 
+  // 删除某个列
+  removeItem = id =>{
+    const {dispatch}=this.props;
+    Modal.confirm({
+      title: '确认删除吗?',
+      icon: <ExclamationCircleOutlined />,
+      content: '注意该操作不可逆转且不可恢复!',
+      okText: '确认删除',
+      okType: 'danger',
+      cancelText: '取消',
+      onOk() {
+        dispatch({
+          type:'text/del',
+          payload:id
+        })
+      },
+      onCancel() {
+      },
+    });
+  }
+
+  // 编辑
+  updateItem = item =>{
+    this.setState({showDrawer:true,type:item.field});// 显示抽屉
+    // 设置值
+    this.formRef.current.setFieldsValue({
+      type:item.type,
+      field:item.field,
+      extra:item.extra,
+      content:item.field==='textArea'?item.content: BraftEditor.createEditorState(item.content)
+    })
+    // 如果是富文本,则调用api设置值
+    if(item.field==='braftEditor'){
+      this.setState({ editorState: BraftEditor.createEditorState(item.content)})
+    }
+  }
+
   render() {
     const { listData, listLoading } = this.props;
     const { type } = this.state;
@@ -107,7 +145,7 @@ class Page extends Component {
     let content = [];
     if (listData !== null) {
       content = [...listData.content];
-      console.log(content);
+      console.log(listData);
     }
     const textAreaItem = (
       <TextArea
@@ -137,9 +175,9 @@ class Page extends Component {
           <List
             header='列表'
             pagination={{
-              current: listData ? listData.size + 1 : 1,
+              current: listData ? listData.number+1  : 1,
               total: listData ? listData.totalElements : 0,
-              limit: listData ? listData.number : 10,
+              limit: listData ? listData.size : 10,
             }}
             dataSource={content}
             renderItem={item => (
@@ -150,13 +188,10 @@ class Page extends Component {
                 />
                 <div>
                   <Dropdown overlay={<Menu>
-                    <Menu.Item>
-                      查看
-        </Menu.Item>
-                    <Menu.Item>
+                    <Menu.Item onClick={this.updateItem.bind(this,item)}>
                       编辑
         </Menu.Item>
-                    <Menu.Item>
+                    <Menu.Item onClick={this.removeItem.bind(this,item.id)}>
                       删除
         </Menu.Item>
                   </Menu>}>
@@ -172,6 +207,7 @@ class Page extends Component {
 
         {/* 右侧弹窗 */}
         <Drawer
+        forceRender 
           title=""
           width={720}
           onClose={() => this.setState({ showDrawer: false })}

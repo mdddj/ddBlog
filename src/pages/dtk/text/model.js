@@ -1,5 +1,5 @@
 import { message } from 'antd';
-import { list, add } from './service';
+import { list, add, del } from './service';
 
 export default {
   namespace: 'text',
@@ -31,6 +31,18 @@ export default {
         message.error(response.msg);
       }
     },
+    *del({payload},{call,put}){
+      const response = yield call(del,payload);
+      if(response.code===200){
+        message.success(response.msg);
+        yield put({
+          type:'removeItem',
+          payload
+        })
+      }else{
+        message.error(response.msg);
+      }
+    }
   },
 
   reducers: {
@@ -42,8 +54,13 @@ export default {
     },
     addItem(state, { payload }) {
       const {listData, listData: { content } } = state;
-      content.concat(payload);
+      content.unshift(payload);
       return { ...state, listData: { ...listData, content } };
+    },
+    removeItem(state,{payload}){
+      const {listData,listData:{content}} = state;
+     const newContent = content.filter(item=>item.id!==payload);
+     return {...state,listData:{...listData,content:newContent}};
     }
   },
 };
