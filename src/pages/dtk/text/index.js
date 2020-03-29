@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Table, Card, Button, Drawer, Input, Form, Radio, message, List, Typography } from 'antd';
+import { Table, Card, Button, Drawer, Input, Form, Radio, message, List, Menu, Dropdown } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import BraftEditor from 'braft-editor';
 
@@ -79,7 +80,7 @@ class Page extends Component {
       });
   };
 
-  //获取提交的对象
+  // 获取提交的对象
   getContext = values => {
     if (values.field === 'braftEditor') {
       const { outputHTML } = this.state;
@@ -94,6 +95,11 @@ class Page extends Component {
     console.log(value);
     this.setState({ type: value });
   };
+
+  // 抽屉关闭
+  onClose=()=>{
+    this.setState({showDrawer:false})
+  }
 
   render() {
     const { listData, listLoading } = this.props;
@@ -129,16 +135,6 @@ class Page extends Component {
           </Button>
         </Card>
         <Card style={{ marginTop: 8 }}>
-          {/* <Table
-            loading={listLoading}
-            columns={this.columns}
-            dataSource={content}
-            pagination={{
-              current: listData ? listData.size + 1 : 1,
-              total: listData ? listData.totalElements : 0,
-              limit: listData ? listData.number : 10,
-            }}
-          /> */}
           <List
             header='列表'
             pagination={{
@@ -148,17 +144,34 @@ class Page extends Component {
             }}
             dataSource={content}
             renderItem={item => (
-              <List.Item>
+              <List.Item key={item.id}>
                 <List.Item.Meta
                   title={item.type}
-                  description={item.extra}
+                  description={`备注:  ${item.extra}`}
                 />
-                <div>操作</div>
+                <div>
+                  <Dropdown overlay={<Menu>
+                    <Menu.Item>
+                      查看
+        </Menu.Item>
+                    <Menu.Item>
+                      编辑
+        </Menu.Item>
+                    <Menu.Item>
+                      删除
+        </Menu.Item>
+                  </Menu>}>
+                    <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+                      操作 <DownOutlined />
+                    </a>
+                  </Dropdown>
+                </div>
               </List.Item>
             )}
           />
         </Card>
 
+        {/* 右侧弹窗 */}
         <Drawer
           title=""
           width={720}
@@ -171,15 +184,17 @@ class Page extends Component {
                 textAlign: 'right',
               }}
             >
-              <Button onClick={this.onClose} style={{ marginRight: 8 }}>
-                Cancel
+              <Button onClick={this.onClose.bind(this)} style={{ marginRight: 8 }}>
+                取消
               </Button>
               <Button onClick={this.submitData.bind(this)} type="primary">
-                Submit
+               提交
               </Button>
             </div>
           }
         >
+
+          {/* 表单 */}
           <Form
             ref={this.formRef}
             layout="vertical"
@@ -211,7 +226,11 @@ class Page extends Component {
               {textAreaItem}
             </Form.Item>
           </Form>
+          {/* 表单END */}
+
         </Drawer>
+        {/* 右侧弹窗END */}
+
       </PageHeaderWrapper>
     );
   }
