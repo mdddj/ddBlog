@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Table, Card, Button, Drawer, Input, Form, Radio, message } from 'antd';
+import { Table, Card, Button, Drawer, Input, Form, Radio, message, List, Typography } from 'antd';
 import { connect } from 'dva';
 import BraftEditor from 'braft-editor';
 
@@ -47,7 +47,7 @@ class Page extends Component {
    */
   handleChange = editorState => {
     this.setState({
-      editorState: editorState,
+      editorState: editorState.createEditorState(''),
       outputHTML: editorState.toHTML(),
     });
   };
