@@ -6,8 +6,8 @@ export default {
   state: {
     listData: null,
   },
-
   effects: {
+    // 获取数据列表和分页数据
     *list({ payload }, { call, put }) {
       const response = yield call(list, payload);
       if (response.code === 200) {
@@ -19,6 +19,7 @@ export default {
         message.error(response.msg);
       }
     },
+    // 新增
     *add({ payload }, { call, put }) {
       const response = yield call(add, payload);
       if (response.code === 200) {
@@ -31,6 +32,7 @@ export default {
         message.error(response.msg);
       }
     },
+    // 删除
     *del({ payload }, { call, put }) {
       const response = yield call(del, payload);
       if (response.code === 200) {
@@ -43,6 +45,7 @@ export default {
         message.error(response.msg);
       }
     },
+    // 修改
     *update({ payload }, { call, put }) {
       const response = yield call(update, payload);
       if (response.code === 200) {
