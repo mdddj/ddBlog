@@ -1,17 +1,18 @@
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Modal, Card, Button, Drawer, Input, Form, Radio, message, List, Menu, Dropdown } from 'antd';
+import { Modal, Card, Button, Drawer, Input, Form, Radio, message, List, Menu, Dropdown, Spin  } from 'antd';
 import { DownOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import BraftEditor from 'braft-editor';
-
-import styles from './style.less';
 
 const { TextArea } = Input;
 
 @connect(({ text: { listData }, loading }) => ({
   listData,
   listLoading: loading.effects['text/list'],
+  addLoading: loading.effects['text/add'],
+  updateLoading: loading.effects['text/update'],
+  delLoading: loading.effects['text/del']
 }))
 class Page extends Component {
   formRef = React.createRef();
@@ -21,24 +22,9 @@ class Page extends Component {
     showDrawer: false,
     outputHTML: '<p></p>',
     type: 'textArea',
-    updateItem: null
+    updateItem: null,
+    delId:null
   };
-
-  columns = [
-    {
-      title: 'Id',
-      dataIndex: 'id',
-      key: 'id',
-    },
-    {
-      title: '类型',
-      dataIndex: 'type',
-    },
-    {
-      title: '表单类型',
-      dataIndex: 'field',
-    },
-  ];
 
   componentDidMount() {
     this.fetchListData({ page: 0, limit: 10 });
@@ -69,6 +55,7 @@ class Page extends Component {
     this.formRef.current
       .validateFields()
       .then(values => {
+
         const dataObj = this.getValues(values, updateItem);
         if (updateItem && updateItem.id) {
           // 修改操作
@@ -96,7 +83,6 @@ class Page extends Component {
     if (values.field === 'braftEditor') {
       const { outputHTML } = this.state;
       resultData.content = outputHTML;
-      return resultData;
     }
     if (updateItem && updateItem.id) {
       resultData.id = updateItem.id;
@@ -129,6 +115,8 @@ class Page extends Component {
   // 删除某个列
   removeItem = id => {
     const { dispatch } = this.props;
+    const that = this;
+    that.setState({delId:id});
     Modal.confirm({
       title: '确认删除吗?',
       icon: <ExclamationCircleOutlined />,
@@ -141,8 +129,10 @@ class Page extends Component {
           type: 'text/del',
           payload: id
         })
+        that.setState({delId:null});
       },
       onCancel() {
+        that.setState({delId:null});
       },
     });
   }
@@ -157,15 +147,17 @@ class Page extends Component {
       extra: item.extra,
       content: item.field === 'textArea' ? item.content : BraftEditor.createEditorState(item.content)
     })
-    // 如果是富文本,则调用api设置值
-    if (item.field === 'braftEditor') {
-      this.setState({ editorState: BraftEditor.createEditorState(item.content) })
-    }
   }
 
+  // 分页跳转
+  pageChange = (page,limit) =>{
+    this.fetchListData({page:page-1,limit});
+  }
+
+  // 渲染
   render() {
-    const { listData, listLoading } = this.props;
-    const { type, updateItem } = this.state;
+    const { listData, listLoading, addLoading } = this.props;
+    const { type, updateItem,delId } = this.state;
 
     let content = [];
     if (listData !== null) {
@@ -195,17 +187,22 @@ class Page extends Component {
             添加新的
           </Button>
         </Card>
-        <Card style={{ marginTop: 8 }} loading={listLoading}>
+        <Card style={{ marginTop: 8 }} loading={listLoading || addLoading}>
           <List
+          split
             header='列表'
             pagination={{
               current: listData ? listData.number + 1 : 1,
               total: listData ? listData.totalElements : 0,
               limit: listData ? listData.size : 10,
+              onChange:this.pageChange.bind(this)
             }}
             dataSource={content}
             renderItem={item => (
-              <List.Item key={item.id}>
+                <Spin key={item.id} spinning={updateItem && updateItem.id === item.id || delId && delId===item.id}>
+              <List.Item style={{borderBottom:'1px solid #e8e8e8'}}>
+
+                
                 <List.Item.Meta
                   title={item.type}
                   description={`备注:  ${item.extra}`}
@@ -224,7 +221,7 @@ class Page extends Component {
                     </a>
                   </Dropdown>
                 </div>
-              </List.Item>
+              </List.Item></Spin>
             )}
           />
         </Card>
