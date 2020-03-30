@@ -17,10 +17,11 @@ class Page extends Component {
   formRef = React.createRef();
 
   state = {
-    editorState: BraftEditor.createEditorState('<p>请输入文章内容 <b>Hello World!</b></p>'),
+    editorState: BraftEditor.createEditorState(''),
     showDrawer: false,
     outputHTML: '<p></p>',
     type: 'textArea',
+    updateItem: null
   };
 
   columns = [
@@ -61,18 +62,29 @@ class Page extends Component {
     });
   };
 
+  // 表单提交
   submitData = () => {
-    // this.formRef.current.submit();
     const { dispatch } = this.props;
+    const {updateItem}=this.state;
     this.formRef.current
       .validateFields()
       .then(values => {
-        const dataObj = this.getContext(values);
-        dispatch({
-          type: 'text/add',
-          payload: dataObj,
-        });
-        this.setState({ showDrawer: false });
+        const dataObj = this.getValues(values,updateItem);
+        
+        if(updateItem && updateItem.id){
+          // 修改操作
+          dispatch({
+            type: 'text/update',
+            payload: dataObj,
+          });
+        }else{
+          // 新增操作
+          dispatch({
+            type: 'text/add',
+            payload: dataObj,
+          });
+        }
+        this.onClose();
       })
       .catch(() => {
         message.error('请按提示修改正确内容!');
@@ -80,30 +92,44 @@ class Page extends Component {
   };
 
   // 获取提交的对象
-  getContext = values => {
+  getValues = (values,updateItem) => {
+    const resultData = values;
     if (values.field === 'braftEditor') {
       const { outputHTML } = this.state;
-      values.content = outputHTML;
-      return values;
+      resultData.content = outputHTML;
+      return resultData;
     }
-    return values;
+    if(updateItem && updateItem.id){
+      resultData.id = updateItem.id;
+    }
+    return resultData;
   };
 
-  // 表单切换(普通/富文本)
+  // 单选按钮切换(普通/富文本)
   fieldTypeChange = e => {
     const { value } = e.target;
-    console.log(value);
     this.setState({ type: value });
+    const {editorState,updateItem}=this.state;
+    if(value==='textArea'){
+      if(updateItem && updateItem.field==='textArea'){
+        this.formRef.current.setFieldsValue({content:updateItem.content});
+      }else{
+        this.formRef.current.setFieldsValue({content:''});
+      }
+    }else{
+      this.formRef.current.setFieldsValue({content:editorState});
+    }
   };
 
   // 抽屉关闭
-  onClose=()=>{
-    this.setState({showDrawer:false})
+  onClose = () => {
+    this.setState({ showDrawer: false,editorState:BraftEditor.createEditorState(''),updateItem:null})
+    this.formRef.current.resetFields();
   }
 
   // 删除某个列
-  removeItem = id =>{
-    const {dispatch}=this.props;
+  removeItem = id => {
+    const { dispatch } = this.props;
     Modal.confirm({
       title: '确认删除吗?',
       icon: <ExclamationCircleOutlined />,
@@ -113,8 +139,8 @@ class Page extends Component {
       cancelText: '取消',
       onOk() {
         dispatch({
-          type:'text/del',
-          payload:id
+          type: 'text/del',
+          payload: id
         })
       },
       onCancel() {
@@ -122,25 +148,25 @@ class Page extends Component {
     });
   }
 
-  // 编辑
-  updateItem = item =>{
-    this.setState({showDrawer:true,type:item.field});// 显示抽屉
+  // 编辑某个列
+  updateItem = item => {
+    this.setState({ showDrawer: true, type: item.field, updateItem: item });// 显示抽屉
     // 设置值
     this.formRef.current.setFieldsValue({
-      type:item.type,
-      field:item.field,
-      extra:item.extra,
-      content:item.field==='textArea'?item.content: BraftEditor.createEditorState(item.content)
+      type: item.type,
+      field: item.field,
+      extra: item.extra,
+      content: item.field === 'textArea' ? item.content : BraftEditor.createEditorState(item.content)
     })
     // 如果是富文本,则调用api设置值
-    if(item.field==='braftEditor'){
-      this.setState({ editorState: BraftEditor.createEditorState(item.content)})
+    if (item.field === 'braftEditor') {
+      this.setState({ editorState: BraftEditor.createEditorState(item.content) })
     }
   }
 
   render() {
     const { listData, listLoading } = this.props;
-    const { type } = this.state;
+    const { type, updateItem } = this.state;
 
     let content = [];
     if (listData !== null) {
@@ -175,7 +201,7 @@ class Page extends Component {
           <List
             header='列表'
             pagination={{
-              current: listData ? listData.number+1  : 1,
+              current: listData ? listData.number + 1 : 1,
               total: listData ? listData.totalElements : 0,
               limit: listData ? listData.size : 10,
             }}
@@ -188,10 +214,10 @@ class Page extends Component {
                 />
                 <div>
                   <Dropdown overlay={<Menu>
-                    <Menu.Item onClick={this.updateItem.bind(this,item)}>
+                    <Menu.Item onClick={this.updateItem.bind(this, item)}>
                       编辑
         </Menu.Item>
-                    <Menu.Item onClick={this.removeItem.bind(this,item.id)}>
+                    <Menu.Item onClick={this.removeItem.bind(this, item.id)}>
                       删除
         </Menu.Item>
                   </Menu>}>
@@ -207,10 +233,10 @@ class Page extends Component {
 
         {/* 右侧弹窗 */}
         <Drawer
-        forceRender 
-          title=""
+          forceRender
+          title={updateItem?'修改':'新增'}
           width={720}
-          onClose={() => this.setState({ showDrawer: false })}
+          onClose={this.onClose}
           visible={this.state.showDrawer}
           bodyStyle={{ paddingBottom: 80 }}
           footer={
@@ -223,7 +249,7 @@ class Page extends Component {
                 取消
               </Button>
               <Button onClick={this.submitData.bind(this)} type="primary">
-               提交
+                提交
               </Button>
             </div>
           }
@@ -244,7 +270,7 @@ class Page extends Component {
             </Form.Item>
 
             <Form.Item label="值类型" name="field">
-              <Radio.Group onChange={this.fieldTypeChange}>
+              <Radio.Group onChange={this.fieldTypeChange.bind(this)}>
                 <Radio.Button value="textArea">普通文本</Radio.Button>
                 <Radio.Button value="braftEditor">富文本</Radio.Button>
               </Radio.Group>

@@ -17,3 +17,10 @@ export function del(id){
     method:'delete'
   })
 }
+
+export function update(params){
+  return request(urls.text,{
+    method:'put',
+    data:params
+  })
+}

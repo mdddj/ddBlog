@@ -1,5 +1,5 @@
 import { message } from 'antd';
-import { list, add, del } from './service';
+import { list, add, del, update } from './service';
 
 export default {
   namespace: 'text',
@@ -31,15 +31,27 @@ export default {
         message.error(response.msg);
       }
     },
-    *del({payload},{call,put}){
-      const response = yield call(del,payload);
-      if(response.code===200){
+    *del({ payload }, { call, put }) {
+      const response = yield call(del, payload);
+      if (response.code === 200) {
         message.success(response.msg);
         yield put({
-          type:'removeItem',
+          type: 'removeItem',
           payload
         })
-      }else{
+      } else {
+        message.error(response.msg);
+      }
+    },
+    *update({ payload }, { call, put }) {
+      const response = yield call(update, payload);
+      if (response.code === 200) {
+        message.success(response.msg);
+        yield put({
+          type: 'updateItem',
+          payload: response.data
+        })
+      } else {
         message.error(response.msg);
       }
     }
@@ -53,14 +65,20 @@ export default {
       };
     },
     addItem(state, { payload }) {
-      const {listData, listData: { content } } = state;
+      const { listData, listData: { content } } = state;
       content.unshift(payload);
       return { ...state, listData: { ...listData, content } };
     },
-    removeItem(state,{payload}){
-      const {listData,listData:{content}} = state;
-     const newContent = content.filter(item=>item.id!==payload);
-     return {...state,listData:{...listData,content:newContent}};
+    removeItem(state, { payload }) {
+      const { listData, listData: { content } } = state;
+      const newContent = content.filter(item => item.id !== payload);
+      return { ...state, listData: { ...listData, content: newContent } };
+    },
+    updateItem(state, { payload }) {
+      const { listData, listData: { content } } = state;
+      const curUpdateIndex = content.findIndex(item => item.id === payload.id); // 将要修改的item下标
+      content.replice(curUpdateIndex, 1, payload);
+      return { ...state, listData: { ...listData, content: content.replice(curUpdateIndex, 1, payload) } };
     }
   },
 };
