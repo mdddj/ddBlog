@@ -77,7 +77,6 @@ export default {
     updateItem(state, { payload }) {
       const { listData, listData: { content } } = state;
       const curUpdateIndex = content.findIndex(item => item.id === payload.id); // 将要修改的item下标
-      content.replice(curUpdateIndex, 1, payload);
       return { ...state, listData: { ...listData, content: content.splice(curUpdateIndex, 1, payload) } };
     }
   },
