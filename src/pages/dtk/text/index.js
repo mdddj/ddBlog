@@ -65,19 +65,18 @@ class Page extends Component {
   // 表单提交
   submitData = () => {
     const { dispatch } = this.props;
-    const {updateItem}=this.state;
+    const { updateItem } = this.state;
     this.formRef.current
       .validateFields()
       .then(values => {
-        const dataObj = this.getValues(values,updateItem);
-        
-        if(updateItem && updateItem.id){
+        const dataObj = this.getValues(values, updateItem);
+        if (updateItem && updateItem.id) {
           // 修改操作
           dispatch({
             type: 'text/update',
             payload: dataObj,
           });
-        }else{
+        } else {
           // 新增操作
           dispatch({
             type: 'text/add',
@@ -92,14 +91,14 @@ class Page extends Component {
   };
 
   // 获取提交的对象
-  getValues = (values,updateItem) => {
+  getValues = (values, updateItem) => {
     const resultData = values;
     if (values.field === 'braftEditor') {
       const { outputHTML } = this.state;
       resultData.content = outputHTML;
       return resultData;
     }
-    if(updateItem && updateItem.id){
+    if (updateItem && updateItem.id) {
       resultData.id = updateItem.id;
     }
     return resultData;
@@ -109,21 +108,21 @@ class Page extends Component {
   fieldTypeChange = e => {
     const { value } = e.target;
     this.setState({ type: value });
-    const {editorState,updateItem}=this.state;
-    if(value==='textArea'){
-      if(updateItem && updateItem.field==='textArea'){
-        this.formRef.current.setFieldsValue({content:updateItem.content});
-      }else{
-        this.formRef.current.setFieldsValue({content:''});
+    const { editorState, updateItem } = this.state;
+    if (value === 'textArea') {
+      if (updateItem && updateItem.field === 'textArea') {
+        this.formRef.current.setFieldsValue({ content: updateItem.content });
+      } else {
+        this.formRef.current.setFieldsValue({ content: '' });
       }
-    }else{
-      this.formRef.current.setFieldsValue({content:editorState});
+    } else {
+      this.formRef.current.setFieldsValue({ content: editorState });
     }
   };
 
   // 抽屉关闭
   onClose = () => {
-    this.setState({ showDrawer: false,editorState:BraftEditor.createEditorState(''),updateItem:null})
+    this.setState({ showDrawer: false, editorState: BraftEditor.createEditorState(''), updateItem: null })
     this.formRef.current.resetFields();
   }
 
@@ -171,7 +170,6 @@ class Page extends Component {
     let content = [];
     if (listData !== null) {
       content = [...listData.content];
-      console.log(listData);
     }
     const textAreaItem = (
       <TextArea
@@ -234,7 +232,7 @@ class Page extends Component {
         {/* 右侧弹窗 */}
         <Drawer
           forceRender
-          title={updateItem?'修改':'新增'}
+          title={updateItem ? '修改' : '新增'}
           width={720}
           onClose={this.onClose}
           visible={this.state.showDrawer}
@@ -249,7 +247,7 @@ class Page extends Component {
                 取消
               </Button>
               <Button onClick={this.submitData.bind(this)} type="primary">
-                提交
+                {updateItem ? '提交修改' : '确认修改'}
               </Button>
             </div>
           }
