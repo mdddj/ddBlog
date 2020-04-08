@@ -4,7 +4,7 @@ import { fakeAccountLogin, logout } from '@/services/login';
 import { setAuthority } from '@/utils/authority';
 import { getPageQuery } from '@/utils/utils';
 
-import { Modal } from 'antd';
+import { Modal, message } from 'antd';
 
 const Model = {
   namespace: 'login',
@@ -20,13 +20,13 @@ const Model = {
       }); // Login successfully
 
       if (response.code === 200) {
+        message.success('登入成功');
         const urlParams = new URL(window.location.href);
         const params = getPageQuery();
         let { redirect } = params;
 
         if (redirect) {
           const redirectUrlParams = new URL(redirect);
-
           if (redirectUrlParams.origin === urlParams.origin) {
             redirect = redirect.substr(urlParams.origin.length);
 
@@ -68,6 +68,7 @@ const Model = {
   },
   reducers: {
     changeLoginStatus(state, { payload }) {
+      console.log(payload.currentAuthority)
       setAuthority(payload.currentAuthority);
       return { ...state, status: payload.status, type: payload.type };
     },

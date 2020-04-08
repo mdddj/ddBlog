@@ -86,8 +86,8 @@ class Index extends Component {
     })
   }
 
-  handleTableChange = (pagination, filters, sorter) => {
-    console.log(pagination)
+  handleTableChange = pagination => {
+    this.fetchData({ page: pagination.current-1, limit: 10 })
   };
 
   onFinish = values => {
@@ -200,7 +200,7 @@ class Index extends Component {
             <Form.Item name={['c', 'src']} label="图片地址" rules={[{ type: 'url', required: true }]}>
               <Input.TextArea placeholder='要显示的图片地址' />
             </Form.Item>
-            <Form.Item name={['c', 'url']} label="跳转链接" rules={[{ type: 'url', required: true }]}>
+            <Form.Item name={['c', 'url']} label="跳转链接" rules={[{ required: true }]}>
               <Input.TextArea placeholder='点击跳转的url链接' />
             </Form.Item>
             <Form.Item name={['c', 'type']} label="平台" rules={[{ required: true }]}>

@@ -48,6 +48,54 @@ const options = {
       name: 'PHP',
       syntax: 'php',
     },
+    {
+      name: 'dart',
+      syntax: 'dart',
+    },
+    {
+      name: 'json',
+      syntax: 'json',
+    },
+    {
+      name: 'sql',
+      syntax: 'sql',
+    },
+    {
+      name: 'git',
+      syntax: 'git',
+    },
+    {
+      name: 'ini',
+      syntax: 'ini',
+    },
+    {
+      name: 'less',
+      syntax: 'less',
+    },
+    {
+      name: 'scss',
+      syntax: 'scss',
+    },
+    {
+      name: 'yaml',
+      syntax: 'yaml',
+    },
+    {
+      name: 'jsx',
+      syntax: 'jsx',
+    },
+    {
+      name: 'http',
+      syntax: 'http',
+    },
+    {
+      name: 'nginx',
+      syntax: 'nginx',
+    },
+    {
+      name: 'xml',
+      syntax: 'xml',
+    },
   ],
 };
 
@@ -100,7 +148,7 @@ class ArticleAdd extends Component {
           state: obj.state,
         });
         this.formRef2.current.setFieldsValue({ cover: obj.cover });
-        // console.log(this.formRef2)
+        if(obj.cover && obj.cover!=='')this.setState({cover:obj.cover});
         this.setState({ editorState: BraftEditor.createEditorState(obj.content) });
       }
     });
@@ -132,6 +180,7 @@ class ArticleAdd extends Component {
     data.tags = arr;
     data.cover = cover;
     if (updateItem) data.id = updateItem.id;
+    console.log(data)
     dispatch({
       type: 'article/add',
       payload: data,
@@ -270,7 +319,7 @@ class ArticleAdd extends Component {
 
         <Modal
           forceRender
-          title="修改头像"
+          title="修改头图"
           visible={this.state.showCoverModal}
           footer={null}
           onCancel={() => this.setState({ showCoverModal: false })}
