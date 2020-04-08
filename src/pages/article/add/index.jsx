@@ -18,8 +18,10 @@ import { PlusOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import BraftEditor from 'braft-editor';
 import CodeHighlighter from 'braft-extensions/dist/code-highlighter';
+import ColorPicker from 'braft-extensions/dist/color-picker'
 import 'braft-editor/dist/index.css';
 import 'braft-extensions/dist/code-highlighter.css';
+import 'braft-extensions/dist/color-picker.css';
 
 import 'prismjs/components/prism-java';
 import 'prismjs/components/prism-php';
@@ -27,6 +29,7 @@ import 'prismjs/components/prism-php';
 const options = {
   includeEditors: ['content'],
   excludeEditors: ['content'],
+  theme: 'light',
   syntaxs: [
     {
       name: 'JavaScript',
@@ -100,6 +103,7 @@ const options = {
 };
 
 BraftEditor.use(CodeHighlighter(options));
+BraftEditor.use(ColorPicker(options))
 
 const { Option } = Select;
 const { TextArea } = Input;
